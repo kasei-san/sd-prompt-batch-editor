@@ -1,4 +1,5 @@
 import os
+import subprocess
 import uuid
 import json
 import base64
@@ -143,6 +144,7 @@ def _generation_worker(session_id, images, edits, host, port):
     total = len(ordered)
     success = 0
     failed = 0
+    generated_files = []
 
     for i, img_data in enumerate(ordered):
         filename = img_data['filename']
@@ -181,6 +183,7 @@ def _generation_worker(session_id, images, edits, host, port):
                 _save_image_with_metadata(img_bytes, out_path, result.get('info'))
 
                 success += 1
+                generated_files.append(filename)
                 _add_event(session, 'image_done', {'filename': filename})
             else:
                 failed += 1
@@ -198,10 +201,12 @@ def _generation_worker(session_id, images, edits, host, port):
 
     # Complete
     _add_event(session, 'complete', {
-        'output_dir': out_dir,
+        'output_dir': os.path.abspath(out_dir),
+        'output_subdir': os.path.basename(out_dir),
         'total': total,
         'success': success,
         'failed': failed,
+        'files': generated_files,
     })
     session['done'] = True
 
@@ -285,6 +290,28 @@ def generate_progress():
             'X-Accel-Buffering': 'no',
         },
     )
+
+
+@app.route('/api/open-folder', methods=['POST'])
+def open_folder():
+    """Open a folder in Windows Explorer."""
+    data = request.get_json()
+    folder = data.get('path', '')
+    folder = os.path.abspath(folder)
+    if not os.path.isdir(folder):
+        return jsonify({'error': 'ディレクトリが存在しません'}), 404
+    subprocess.Popen(['explorer', folder])
+    return jsonify({'ok': True})
+
+
+@app.route('/api/output/<subdir>/<filename>')
+def serve_output(subdir, filename):
+    """Serve a generated image from the output directory."""
+    filepath = os.path.join(os.path.abspath(OUTPUT_DIR), subdir, filename)
+    if not os.path.isfile(filepath):
+        return jsonify({'error': 'ファイルが見つかりません'}), 404
+    from flask import send_file
+    return send_file(filepath, mimetype='image/png')
 
 
 if __name__ == '__main__':

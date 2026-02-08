@@ -99,6 +99,23 @@
             </div>
             <div class="progress-log"></div>
         </div>
+
+        <!-- Results -->
+        <div id="results-section" class="section hidden">
+            <div class="section-header">
+                <span class="section-title">生成結果</span>
+            </div>
+            <div id="results-output-dir" class="results-output-dir"></div>
+            <div id="results-grid" class="results-grid"></div>
+        </div>
+    </div>
+
+    <!-- Image Modal -->
+    <div id="image-modal" class="modal hidden" onclick="closeModal(event)">
+        <div class="modal-content">
+            <img id="modal-img" src="" alt="">
+            <div id="modal-filename" class="modal-filename"></div>
+        </div>
     </div>
 
     <!-- Toast Container -->

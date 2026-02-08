@@ -395,6 +395,9 @@ function connectSSE(sessionId) {
         addLogEntry(`全${data.total}枚の生成が完了 (成功: ${data.success}, 失敗: ${data.failed})`, 'success');
         showToast(`生成完了: ${data.success}枚成功`, 'success');
 
+        // Show results
+        showResults(data);
+
         // Browser notification
         if (Notification.permission === 'granted') {
             new Notification('SD Prompt Batch Editor', {
@@ -422,6 +425,64 @@ function addLogEntry(text, type = '') {
     log.appendChild(entry);
     log.scrollTop = log.scrollHeight;
 }
+
+// --- Results ---
+
+function showResults(data) {
+    const section = $('#results-section');
+    section.classList.remove('hidden');
+
+    // Output directory link
+    const dirEl = $('#results-output-dir');
+    const dirPath = data.output_dir;
+    dirEl.innerHTML = `<a onclick="openFolder('${escapeHtml(dirPath.replace(/\\/g, '\\\\'))}')">${escapeHtml(dirPath)}</a>`;
+
+    // Image grid
+    const grid = $('#results-grid');
+    const subdir = data.output_subdir;
+    grid.innerHTML = (data.files || []).map(f => {
+        const src = `/api/output/${encodeURIComponent(subdir)}/${encodeURIComponent(f)}`;
+        return `
+            <div class="result-card" onclick="openModal('${src}', '${escapeHtml(f)}')">
+                <img src="${src}" alt="${escapeHtml(f)}" loading="lazy">
+                <div class="result-filename" title="${escapeHtml(f)}">${escapeHtml(f)}</div>
+            </div>
+        `;
+    }).join('');
+
+    section.scrollIntoView({ behavior: 'smooth' });
+}
+
+async function openFolder(path) {
+    try {
+        await fetch('/api/open-folder', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ path }),
+        });
+    } catch {
+        showToast('フォルダを開けませんでした', 'error');
+    }
+}
+
+function openModal(src, filename) {
+    const modal = $('#image-modal');
+    $('#modal-img').src = src;
+    $('#modal-filename').textContent = filename;
+    modal.classList.remove('hidden');
+}
+
+function closeModal(e) {
+    if (e.target === $('#image-modal')) {
+        $('#image-modal').classList.add('hidden');
+    }
+}
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        $('#image-modal').classList.add('hidden');
+    }
+});
 
 // --- Init ---
 
