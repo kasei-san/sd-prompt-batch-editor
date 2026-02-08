@@ -68,92 +68,33 @@ class ForgeClient:
     def build_payload(self, metadata: dict) -> dict:
         """Convert parsed PNG metadata to txt2img API payload.
 
-        Metadata keys -> API keys mapping:
-            positive_prompt -> prompt
-            negative_prompt -> negative_prompt
-            Steps -> steps
-            Sampler -> sampler_name
-            Schedule type -> scheduler
-            CFG scale -> cfg_scale
-            Seed -> seed
-            Size-1, Size-2 -> width, height
-            Model + Model hash -> override_settings.sd_model_checkpoint
-            Clip skip -> override_settings.CLIP_stop_at_last_layers
-            Hires upscale -> hr_scale (+ enable_hr: true)
-            Hires steps -> hr_second_pass_steps
-            Hires upscaler -> hr_upscaler
-            Denoising strength -> denoising_strength
+        Uses the 'infotext' approach: pass the raw metadata text to Forge
+        and let it parse all fields (including Hires fix, schedulers, etc.).
+        Only override prompt/negative_prompt with edited versions.
         """
         payload = {
             'prompt': metadata.get('positive_prompt', ''),
             'negative_prompt': metadata.get('negative_prompt', ''),
-            'steps': int(metadata.get('Steps', 20)),
-            'sampler_name': metadata.get('Sampler', 'Euler a'),
-            'cfg_scale': float(metadata.get('CFG scale', 7)),
-            'seed': int(metadata.get('Seed', -1)),
-            'width': int(metadata.get('Size-1', 512)),
-            'height': int(metadata.get('Size-2', 512)),
             'send_images': True,
             'save_images': False,
             'override_settings_restore_afterwards': True,
         }
 
-        # Scheduler
-        schedule_type = metadata.get('Schedule type')
-        if schedule_type and schedule_type != 'Automatic':
-            payload['scheduler'] = schedule_type
+        # Use infotext to let Forge parse all generation parameters natively
+        raw_infotext = metadata.get('_raw')
+        if raw_infotext:
+            payload['infotext'] = raw_infotext
 
-        # Override settings
+        # Model resolution via override_settings
         override = {}
-
-        # Model resolution
         model_name = metadata.get('Model')
         model_hash = metadata.get('Model hash')
         resolved = self.resolve_model(model_name, model_hash)
         if resolved:
             override['sd_model_checkpoint'] = resolved
 
-        # Clip skip
-        clip_skip = metadata.get('Clip skip')
-        if clip_skip is not None:
-            try:
-                override['CLIP_stop_at_last_layers'] = int(clip_skip)
-            except (ValueError, TypeError):
-                pass
-
         if override:
             payload['override_settings'] = override
-
-        # Hires fix
-        hires_upscale = metadata.get('Hires upscale')
-        if hires_upscale:
-            try:
-                payload['enable_hr'] = True
-                payload['hr_scale'] = float(hires_upscale)
-            except (ValueError, TypeError):
-                pass
-
-            hires_steps = metadata.get('Hires steps')
-            if hires_steps:
-                try:
-                    payload['hr_second_pass_steps'] = int(hires_steps)
-                except (ValueError, TypeError):
-                    pass
-
-            hires_upscaler = metadata.get('Hires upscaler')
-            if hires_upscaler:
-                payload['hr_upscaler'] = hires_upscaler
-
-            # Forge requires this field when hires is enabled, otherwise crashes with NoneType error
-            payload['hr_additional_modules'] = ['Use same choices']
-
-        # Denoising strength
-        denoise = metadata.get('Denoising strength')
-        if denoise is not None:
-            try:
-                payload['denoising_strength'] = float(denoise)
-            except (ValueError, TypeError):
-                pass
 
         return payload
 
@@ -172,7 +113,6 @@ class ForgeClient:
             body = resp.text
             try:
                 j = resp.json()
-                # Forge returns {"detail": "traceback..."} or {"error": "...", "detail": "..."}
                 detail = j.get('detail') or j.get('error') or j.get('errors') or body
             except Exception:
                 detail = body

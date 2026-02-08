@@ -115,8 +115,11 @@ def extract_metadata(filepath: str) -> dict | None:
     """Read a PNG file and extract parsed generation parameters.
 
     Returns None if the file has no valid SD metadata.
+    The returned dict includes '_raw' key with the original parameters text.
     """
     raw = read_metadata(filepath)
     if raw is None or not is_sd_metadata(raw):
         return None
-    return parse_generation_parameters(raw)
+    result = parse_generation_parameters(raw)
+    result['_raw'] = raw
+    return result

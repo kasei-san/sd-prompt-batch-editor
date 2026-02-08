@@ -378,8 +378,7 @@ function connectSSE(sessionId) {
 
     es.addEventListener('error_event', (e) => {
         const data = JSON.parse(e.data);
-        const detail = data.detail || data.message;
-        addErrorEntry(data.filename, data.message, detail);
+        addLogEntry(`${data.filename} - エラー: ${data.message}`, 'error');
     });
 
     es.addEventListener('complete', (e) => {
@@ -423,21 +422,6 @@ function addLogEntry(text, type = '') {
     const entry = document.createElement('div');
     entry.className = `log-entry ${type}`;
     entry.textContent = text;
-    log.appendChild(entry);
-    log.scrollTop = log.scrollHeight;
-}
-
-function addErrorEntry(filename, message, detail) {
-    const log = $('.progress-log');
-    const entry = document.createElement('div');
-    entry.className = 'log-entry error error-copyable';
-    entry.innerHTML = `<span class="error-summary">${escapeHtml(filename)} - エラー: ${escapeHtml(message)}</span><span class="error-copy-hint">[ クリックでコピー ]</span>`;
-    entry.title = detail;
-    entry.addEventListener('click', () => {
-        navigator.clipboard.writeText(detail).then(() => {
-            showToast('エラー詳細をコピーしました', 'info');
-        });
-    });
     log.appendChild(entry);
     log.scrollTop = log.scrollHeight;
 }

@@ -442,24 +442,6 @@ button {
     color: var(--success);
 }
 
-.progress-log .log-entry.error-copyable {
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.progress-log .log-entry.error-copyable:hover {
-    background: rgba(239, 83, 80, 0.1);
-}
-
-.error-copy-hint {
-    font-size: 0.7rem;
-    color: #888;
-    white-space: nowrap;
-    margin-left: 8px;
-}
-
 /* Toast */
 .toast-container {
     position: fixed;

@@ -1,6 +1,5 @@
 import os
 import subprocess
-import traceback
 import uuid
 import json
 import base64
@@ -198,8 +197,9 @@ def _generation_worker(session_id, images, edits, host, port):
             _add_event(session, 'error_event', {
                 'filename': filename,
                 'message': str(e),
-                'detail': traceback.format_exc(),
             })
+            # Stop on first error
+            break
 
     # Complete
     _add_event(session, 'complete', {
