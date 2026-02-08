@@ -169,9 +169,12 @@ class ForgeClient:
             timeout=TIMEOUT_GENERATE,
         )
         if not resp.ok:
+            body = resp.text
             try:
-                detail = resp.json().get('detail', resp.text)
+                j = resp.json()
+                # Forge returns {"detail": "traceback..."} or {"error": "...", "detail": "..."}
+                detail = j.get('detail') or j.get('error') or j.get('errors') or body
             except Exception:
-                detail = resp.text
-            raise RuntimeError(f"HTTP {resp.status_code}: {detail}")
+                detail = body
+            raise RuntimeError(f"Forge API HTTP {resp.status_code}\n{detail}")
         return resp.json()
