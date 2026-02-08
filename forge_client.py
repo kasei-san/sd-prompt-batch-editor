@@ -144,6 +144,9 @@ class ForgeClient:
             if hires_upscaler:
                 payload['hr_upscaler'] = hires_upscaler
 
+            # Forge requires this field when hires is enabled, otherwise crashes with NoneType error
+            payload['hr_additional_modules'] = ['Use same choices']
+
         # Denoising strength
         denoise = metadata.get('Denoising strength')
         if denoise is not None:
