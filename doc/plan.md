@@ -5,13 +5,13 @@
 | Step | 内容 | 状態 |
 |------|------|------|
 | 1 | 基盤ファイル (requirements.txt, .env, .gitignore, start.bat, app.py) | ✅ 完了 |
-| 2 | PNGメタデータパーサー (metadata_parser.py) | 🔄 実装中 |
-| 3 | プロンプト編集エンジン (prompt_editor.py) | ⬜ 未着手 |
-| 4 | フロントエンド (HTML/CSS/JS) | ⬜ 未着手 |
-| 5 | Forge APIクライアント (forge_client.py) | ⬜ 未着手 |
-| 6 | バッチ生成エンジン (app.py ワーカー) | ⬜ 未着手 |
-| 7 | 画像保存処理 | ⬜ 未着手 |
-| 8 | ドキュメント (README.md) | ⬜ 未着手 |
+| 2 | PNGメタデータパーサー (metadata_parser.py) | ✅ 完了 |
+| 3 | プロンプト編集エンジン (prompt_editor.py) | ✅ 完了 |
+| 4 | フロントエンド (HTML/CSS/JS) | ✅ 完了 |
+| 5 | Forge APIクライアント (forge_client.py) | ✅ 完了 |
+| 6 | バッチ生成エンジン (app.py ワーカー) | ✅ 完了 |
+| 7 | 画像保存処理 | ✅ 完了 |
+| 8 | ドキュメント (README.md) | ✅ 完了 |
 
 ## Context
 
