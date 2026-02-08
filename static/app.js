@@ -78,7 +78,7 @@ function addTags(prompt, tagsToAdd) {
     if (!tagsToAdd) return prompt;
     prompt = prompt.trim();
     if (!prompt) return tagsToAdd;
-    return prompt + ', ' + tagsToAdd;
+    return tagsToAdd + ', ' + prompt;
 }
 
 function applyEdits(prompt, remove, add) {

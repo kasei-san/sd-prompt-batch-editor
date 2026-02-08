@@ -2,6 +2,8 @@
 
 import requests
 
+from metadata_parser import reconstruct_infotext
+
 TIMEOUT_CHECK = 5
 TIMEOUT_GENERATE = 600
 
@@ -80,10 +82,14 @@ class ForgeClient:
             'override_settings_restore_afterwards': True,
         }
 
-        # Use infotext to let Forge parse all generation parameters natively
+        # Reconstruct infotext with edited prompts so Forge sees consistent data
         raw_infotext = metadata.get('_raw')
         if raw_infotext:
-            payload['infotext'] = raw_infotext
+            payload['infotext'] = reconstruct_infotext(
+                raw_infotext,
+                metadata.get('positive_prompt', ''),
+                metadata.get('negative_prompt', ''),
+            )
 
         # Model resolution via override_settings
         override = {}

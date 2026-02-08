@@ -111,6 +111,32 @@ def parse_generation_parameters(x: str) -> dict:
     return res
 
 
+def reconstruct_infotext(original_raw: str, new_positive: str, new_negative: str) -> str:
+    """Reconstruct raw infotext text with edited prompts.
+
+    Replaces the positive and negative prompts in the raw metadata text
+    while preserving the settings line. This ensures Forge sees consistent
+    prompt data in both the explicit fields and the infotext.
+    """
+    lines = original_raw.strip().split("\n")
+
+    # Find the settings line (last line with 3+ key-value pairs)
+    *content_lines, lastline = lines
+    if len(re_param.findall(lastline)) < 3:
+        # Last line is not a settings line, treat as content
+        content_lines.append(lastline)
+        lastline = ''
+
+    # Reconstruct: new_positive + Negative prompt: new_negative + settings line
+    parts = [new_positive]
+    if new_negative:
+        parts.append(f"Negative prompt: {new_negative}")
+    if lastline:
+        parts.append(lastline)
+
+    return '\n'.join(parts)
+
+
 def extract_metadata(filepath: str) -> dict | None:
     """Read a PNG file and extract parsed generation parameters.
 

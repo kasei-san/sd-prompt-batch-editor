@@ -110,14 +110,14 @@ def remove_tags(prompt: str, tags_to_remove: list[str]) -> str:
 
 
 def add_tags(prompt: str, tags_to_add: str) -> str:
-    """Add tags to the end of a prompt."""
+    """Add tags to the beginning of a prompt."""
     tags_to_add = tags_to_add.strip()
     if not tags_to_add:
         return prompt
     prompt = prompt.strip()
     if not prompt:
         return tags_to_add
-    return prompt + ', ' + tags_to_add
+    return tags_to_add + ', ' + prompt
 
 
 def find_common_tags(prompts: list[str]) -> list[str]:
