@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(echo:*)",
+      "Bash(vim:*)",
+      "Bash(/usr/bin/vim:*)",
+      "Bash(git -C \"C:/Users/かせいさん/work/02\" status)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nStep 1: 基盤ファイル作成\n\n- requirements.txt \\(Flask, Pillow, requests, python-dotenv\\)\n- .env.example \\(設定テンプレート\\)\n- .gitignore \\(venv, output, .env, __pycache__\\)\n- start.bat \\(venv作成→依存install→ブラウザ起動→サーバ起動\\)\n- app.py \\(Flask最小構成\\)\n- templates/index.html \\(プレースホルダ\\)\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nStep 2: PNGメタデータパーサー + 設計書\n\n- metadata_parser.py: Forge infotext_utils.py のパースロジックを移植\n  - PNG parametersテキストチャンク読み取り\n  - positive/negative prompt分離\n  - 設定行のkey-value解析 \\(Steps, Sampler, CFG, Seed, Size等\\)\n  - 数値フィールドの型変換\n- doc/plan.md: 設計書と進捗管理\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nStep 3: プロンプト編集エンジン\n\n- prompt_editor.py:\n  - tokenize\\(\\): 括弧深度を追跡したカンマ分割トークナイザ\n  - extract_core\\(\\): 括弧・重みを剥いたコアタグ抽出\n  - remove_tags\\(\\): コア部分でのマッチによるタグ除去\n  - add_tags\\(\\): プロンプト末尾へのタグ追加\n  - find_common_tags\\(\\): 全プロンプトの共通タグ\\(積集合\\)計算\n  - apply_edits\\(\\): 削除+追加の一括適用\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nStep 4: フロントエンド実装\n\n- templates/index.html: メインページ \\(ステータスバー、D&D、画像グリッド、共通タグ、編集、プレビュー、進捗\\)\n- static/style.css: ダークテーマCSS\n- static/app.js: フロントエンドロジック\n  - D&D + ファイル選択による画像アップロード\n  - トークナイザ/タグ編集 \\(Python側と同等ロジック\\)\n  - 共通タグ分析 \\(積集合計算\\)\n  - プレビュー表示\n  - SSE進捗受信 + Web Notification\n  - トースト通知\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nStep 5: Forge APIクライアント\n\n- forge_client.py:\n  - check_connection\\(\\): Forge API接続確認\n  - get_models\\(\\): モデル一覧取得 \\(キャッシュ付き\\)\n  - resolve_model\\(\\): Model hash→名前一致→部分一致の順でモデル解決\n  - build_payload\\(\\): メタデータ→txt2img APIペイロード変換\n  - txt2img\\(\\): 生成API呼び出し \\(タイムアウト600秒\\)\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nStep 6-7: バッチ生成エンジン + 画像保存\n\n- app.py 全面拡張:\n  - POST /api/upload: PNG アップロード + メタデータ解析 + サムネイル生成\n  - GET /api/check-forge: Forge API接続確認\n  - POST /api/generate: バッチ生成開始 \\(バックグラウンドスレッド\\)\n  - GET /api/generate/progress: SSE進捗ストリーム\n  - モデルグルーピングによるモデル切替最小化\n  - 画像保存: OUTPUT_DIR/YYYYMMDDHHMMSS/ にPNGメタデータ付きで保存\n  - API response info からメタデータ復元のフォールバック\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(python -m venv:*)",
+      "Bash(source:*)",
+      "Bash(pip install:*)",
+      "Bash(timeout 5 python:*)",
+      "Bash(git commit:*)",
+      "Bash(python.exe -m pip install:*)",
+      "WebSearch",
+      "WebFetch(domain:github.com)"
+    ]
+  }
+}
