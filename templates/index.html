@@ -4,9 +4,106 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SD Prompt Batch Editor</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <h1>SD Prompt Batch Editor</h1>
-    <p>準備中...</p>
+    <div class="container">
+        <h1>SD Prompt Batch Editor</h1>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span>SD Forge: <span id="forge-status-text">確認中...</span></span>
+            </div>
+            <div class="api-settings">
+                <label>Host:</label>
+                <input type="text" id="forge-host" value="127.0.0.1" style="width:100px;">
+                <label>Port:</label>
+                <input type="text" id="forge-port" value="7860" style="width:70px;">
+            </div>
+        </div>
+
+        <!-- Drop Zone -->
+        <div class="drop-zone">
+            <p>PNG画像をここにドロップ</p>
+            <p class="sub">クリックしてファイルを選択することもできます</p>
+        </div>
+
+        <!-- Image Grid -->
+        <div class="section">
+            <div class="section-header">
+                <span class="section-title">読み込んだ画像</span>
+                <button id="clear-all-btn" class="btn-danger hidden">全削除</button>
+            </div>
+            <div class="image-grid"></div>
+            <p class="no-images">画像がありません</p>
+        </div>
+
+        <!-- Common Tags -->
+        <div class="section">
+            <div class="section-header">
+                <span class="section-title">共通プロンプト</span>
+            </div>
+            <div>
+                <div style="margin-bottom:8px;">
+                    <span style="font-size:0.8rem;color:var(--text-secondary);">Positive共通:</span>
+                    <div id="common-positive" class="common-tags">
+                        <span class="no-images">画像を読み込んでください</span>
+                    </div>
+                </div>
+                <div>
+                    <span style="font-size:0.8rem;color:var(--text-secondary);">Negative共通:</span>
+                    <div id="common-negative" class="common-tags"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prompt Edit -->
+        <div class="section">
+            <div class="section-header">
+                <span class="section-title">プロンプト編集</span>
+            </div>
+            <div class="edit-grid">
+                <label>削除 Positive:</label>
+                <input type="text" id="edit-remove-pos" placeholder="削除するタグ (カンマ区切り)">
+                <label>削除 Negative:</label>
+                <input type="text" id="edit-remove-neg" placeholder="削除するタグ (カンマ区切り)">
+                <label>追加 Positive:</label>
+                <input type="text" id="edit-add-pos" placeholder="追加するタグ (カンマ区切り)">
+                <label>追加 Negative:</label>
+                <input type="text" id="edit-add-neg" placeholder="追加するタグ (カンマ区切り)">
+            </div>
+            <div class="button-row">
+                <button id="btn-preview" class="btn-secondary">プレビュー</button>
+                <button id="btn-generate" class="btn-primary">生成実行</button>
+            </div>
+        </div>
+
+        <!-- Preview -->
+        <div id="preview-section" class="section hidden">
+            <div class="section-header">
+                <span class="section-title">プレビュー</span>
+            </div>
+            <div class="preview-list"></div>
+        </div>
+
+        <!-- Progress -->
+        <div class="section progress-section">
+            <div class="section-header">
+                <span class="section-title">生成進捗</span>
+            </div>
+            <div class="progress-status">待機中</div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" style="width:0%">0%</div>
+            </div>
+            <div class="progress-log"></div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container"></div>
+
+    <script src="/static/app.js"></script>
 </body>
 </html>
