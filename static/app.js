@@ -228,12 +228,21 @@ function renderCommonTags() {
     const commonNeg = findCommonTags(negatives);
 
     posContainer.innerHTML = commonPos.length
-        ? commonPos.map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')
+        ? commonPos.map(t => `<span class="tag clickable" data-tag="${escapeHtml(t)}">${escapeHtml(t)}</span>`).join('')
         : '<span style="color:var(--text-secondary);font-size:0.85rem;">共通タグなし</span>';
 
     negContainer.innerHTML = commonNeg.length
-        ? commonNeg.map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')
+        ? commonNeg.map(t => `<span class="tag clickable" data-tag="${escapeHtml(t)}">${escapeHtml(t)}</span>`).join('')
         : '<span style="color:var(--text-secondary);font-size:0.85rem;">共通タグなし</span>';
+
+    // Add click-to-copy handlers
+    for (const el of $$('.tag.clickable')) {
+        el.addEventListener('click', () => {
+            navigator.clipboard.writeText(el.dataset.tag).then(() => {
+                showToast(`コピー: ${el.dataset.tag}`, 'info');
+            });
+        });
+    }
 }
 
 function escapeHtml(str) {

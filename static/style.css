@@ -210,6 +210,15 @@ h1 {
     font-size: 0.8rem;
 }
 
+.tag.clickable {
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.tag.clickable:hover {
+    background: #3a3a3a;
+}
+
 .no-images {
     color: var(--text-secondary);
     font-size: 0.85rem;
