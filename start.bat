@@ -5,8 +5,8 @@ cd /d "%~dp0"
 
 REM Load .env
 if exist .env (
-    for /f "usebackq tokens=1,2 delims==" %%A in (".env") do (
-        if not "%%A"=="" if not "%%A:~0,1%"=="#" set "%%A=%%B"
+    for /f "usebackq tokens=1,* delims==" %%A in (".env") do (
+        set "%%A=%%B"
     )
 )
 
@@ -25,7 +25,9 @@ REM Install dependencies
 pip install -r requirements.txt -q
 
 REM Open browser
-start http://localhost:%APP_PORT%
+start "" http://localhost:%APP_PORT%
 
 REM Start server
 python app.py
+
+pause
