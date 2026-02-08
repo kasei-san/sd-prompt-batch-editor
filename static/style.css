@@ -227,18 +227,49 @@ h1 {
 
 .edit-grid label {
     font-size: 0.85rem;
-    color: var(--text-secondary);
+    font-weight: 600;
     white-space: nowrap;
+}
+
+.edit-grid label.label-remove-pos {
+    color: #ef9a9a;
+}
+
+.edit-grid label.label-remove-neg {
+    color: #f48fb1;
+}
+
+.edit-grid label.label-add-pos {
+    color: #a5d6a7;
+}
+
+.edit-grid label.label-add-neg {
+    color: #90caf9;
 }
 
 .edit-grid input[type="text"] {
     width: 100%;
     padding: 8px 12px;
     background: var(--bg-input);
-    border: 1px solid var(--border);
     border-radius: 6px;
     color: var(--text-primary);
     font-size: 0.9rem;
+}
+
+.edit-grid input.input-remove-pos {
+    border: 1px solid #ef9a9a44;
+}
+
+.edit-grid input.input-remove-neg {
+    border: 1px solid #f48fb144;
+}
+
+.edit-grid input.input-add-pos {
+    border: 1px solid #a5d6a744;
+}
+
+.edit-grid input.input-add-neg {
+    border: 1px solid #90caf944;
 }
 
 .edit-grid input[type="text"]::placeholder {
