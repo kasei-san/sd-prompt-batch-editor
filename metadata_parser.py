@@ -111,6 +111,22 @@ def parse_generation_parameters(x: str) -> dict:
     return res
 
 
+def _clean_settings_line(line: str) -> str:
+    """Remove 'Use same ...' placeholder values from a settings line.
+
+    Forge UI uses placeholders like 'Use same sampler', 'Use same scheduler',
+    'Use same checkpoint' which are not valid API values.
+    """
+    pairs = re_param.findall(line)
+    cleaned = []
+    for k, v in pairs:
+        v_stripped = _unquote(v).strip()
+        if v_stripped.startswith('Use same'):
+            continue
+        cleaned.append(f"{k.strip()}: {v.strip()}")
+    return ', '.join(cleaned)
+
+
 def reconstruct_infotext(original_raw: str, new_positive: str, new_negative: str) -> str:
     """Reconstruct raw infotext text with edited prompts.
 
@@ -126,6 +142,10 @@ def reconstruct_infotext(original_raw: str, new_positive: str, new_negative: str
         # Last line is not a settings line, treat as content
         content_lines.append(lastline)
         lastline = ''
+
+    # Clean settings line: remove "Use same ..." placeholder values
+    if lastline:
+        lastline = _clean_settings_line(lastline)
 
     # Reconstruct: new_positive + Negative prompt: new_negative + settings line
     parts = [new_positive]

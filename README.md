@@ -55,6 +55,15 @@ python app.py
 | `APP_PORT` | `4644` | このアプリのポート |
 | `OUTPUT_DIR` | `./output` | 生成画像の出力先ディレクトリ |
 
+## Forge の起動方法
+
+| バッチファイル | 用途 |
+|---|---|
+| `webui-user.bat` | 通常の起動。コンソールにプログレスバー等が正常に表示される |
+| `webui-log.bat` | デバッグ用。コンソール出力が `%TEMP%\forge.log` に保存される。Claude Code でログを確認したいときに使う |
+
+`webui-log.bat` 使用時はコンソールに出力されないが、ログファイルに全て記録される。
+
 ## 対応形式
 
 - **対応**: Stable Diffusion WebUI / Forge で生成した PNG (parameters メタデータ付き)

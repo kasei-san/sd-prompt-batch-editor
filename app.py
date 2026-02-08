@@ -4,6 +4,7 @@ import uuid
 import json
 import base64
 import threading
+import traceback
 from io import BytesIO
 from datetime import datetime
 
@@ -30,6 +31,18 @@ generation_sessions = {}  # session_id -> { events: [], done: bool }
 @app.route('/')
 def index():
     return render_template('index.html')
+
+
+@app.route('/api/version')
+def version():
+    """Return file timestamps for debugging."""
+    files = ['app.py', 'metadata_parser.py', 'prompt_editor.py', 'forge_client.py']
+    info = {}
+    for f in files:
+        p = os.path.join(os.path.dirname(__file__), f)
+        if os.path.exists(p):
+            info[f] = datetime.fromtimestamp(os.path.getmtime(p)).strftime('%Y-%m-%d %H:%M:%S')
+    return jsonify(info)
 
 
 @app.route('/api/upload', methods=['POST'])
@@ -123,10 +136,10 @@ def _generation_worker(session_id, images, edits, host, port):
     session = generation_sessions[session_id]
     client = ForgeClient(host, port)
 
-    # Create output directory
+    # Prepare output directory path (created on first successful generation)
     timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
     out_dir = os.path.join(OUTPUT_DIR, timestamp)
-    os.makedirs(out_dir, exist_ok=True)
+    out_dir_created = False
 
     # Group by model to minimize model switches
     model_groups = {}
@@ -172,6 +185,10 @@ def _generation_worker(session_id, images, edits, host, port):
 
             # Build payload and generate
             payload = client.build_payload(metadata)
+            print(f"\n=== Payload for {filename} ===")
+            print(json.dumps({k: v for k, v in payload.items() if k != 'infotext'}, ensure_ascii=False, indent=2))
+            print(f"infotext:\n{payload.get('infotext', '(none)')}")
+            print("=" * 40)
             result = client.txt2img(payload)
 
             # Save image
@@ -179,6 +196,9 @@ def _generation_worker(session_id, images, edits, host, port):
                 img_b64 = result['images'][0]
                 img_bytes = base64.b64decode(img_b64)
 
+                if not out_dir_created:
+                    os.makedirs(out_dir, exist_ok=True)
+                    out_dir_created = True
                 out_path = os.path.join(out_dir, filename)
                 _save_image_with_metadata(img_bytes, out_path, result.get('info'))
 
@@ -196,6 +216,9 @@ def _generation_worker(session_id, images, edits, host, port):
 
         except Exception as e:
             failed += 1
+            tb = traceback.format_exc()
+            print(f"\n!!! Error for {filename} !!!")
+            print(tb)
             _add_event(session, 'error_event', {
                 'filename': filename,
                 'message': str(e),
@@ -317,4 +340,14 @@ def serve_output(subdir, filename):
 
 
 if __name__ == '__main__':
+    # Show file timestamps at startup for debugging
+    _files = ['app.py', 'metadata_parser.py', 'prompt_editor.py', 'forge_client.py']
+    print("=== SD Prompt Batch Editor ===")
+    for _f in _files:
+        _p = os.path.join(os.path.dirname(__file__), _f)
+        if os.path.exists(_p):
+            _mt = datetime.fromtimestamp(os.path.getmtime(_p)).strftime('%Y-%m-%d %H:%M:%S')
+            print(f"  {_f}: {_mt}")
+    print(f"  Port: {APP_PORT}")
+    print("=" * 30)
     app.run(host='0.0.0.0', port=APP_PORT, debug=False)
