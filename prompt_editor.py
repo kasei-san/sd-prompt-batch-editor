@@ -36,7 +36,7 @@ def tokenize(prompt: str) -> list[str]:
         elif ch == '>':
             depth_angle = max(0, depth_angle - 1)
             current.append(ch)
-        elif ch == ',' and depth_round == 0 and depth_square == 0 and depth_angle == 0:
+        elif (ch == ',' or ch == '\n') and depth_round == 0 and depth_square == 0 and depth_angle == 0:
             token = ''.join(current).strip()
             if token:
                 tokens.append(token)

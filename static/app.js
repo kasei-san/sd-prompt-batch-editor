@@ -35,7 +35,7 @@ function tokenize(prompt) {
         else if (ch === ']') { depthSquare = Math.max(0, depthSquare - 1); current.push(ch); }
         else if (ch === '<') { depthAngle++; current.push(ch); }
         else if (ch === '>') { depthAngle = Math.max(0, depthAngle - 1); current.push(ch); }
-        else if (ch === ',' && depthRound === 0 && depthSquare === 0 && depthAngle === 0) {
+        else if ((ch === ',' || ch === '\n') && depthRound === 0 && depthSquare === 0 && depthAngle === 0) {
             const token = current.join('').trim();
             if (token) tokens.push(token);
             current = [];
