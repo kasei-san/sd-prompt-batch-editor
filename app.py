@@ -184,7 +184,9 @@ def _generation_worker(session_id, images, edits, host, port):
 
                 success += 1
                 generated_files.append(filename)
-                _add_event(session, 'image_done', {'filename': filename})
+                # Send payload info (without infotext raw text for brevity)
+                payload_info = {k: v for k, v in payload.items() if k not in ('infotext', 'send_images', 'save_images', 'override_settings_restore_afterwards')}
+                _add_event(session, 'image_done', {'filename': filename, 'payload': payload_info})
             else:
                 failed += 1
                 _add_event(session, 'error_event', {
@@ -306,14 +308,12 @@ def open_folder():
     return jsonify({'ok': True})
 
 
-@app.route('/api/output/<subdir>/<filename>')
+@app.route('/api/output/<subdir>/<path:filename>')
 def serve_output(subdir, filename):
     """Serve a generated image from the output directory."""
-    filepath = os.path.join(os.path.abspath(OUTPUT_DIR), subdir, filename)
-    if not os.path.isfile(filepath):
-        return jsonify({'error': 'ファイルが見つかりません'}), 404
-    from flask import send_file
-    return send_file(filepath, mimetype='image/png')
+    from flask import send_from_directory
+    directory = os.path.join(os.path.abspath(OUTPUT_DIR), subdir)
+    return send_from_directory(directory, filename, mimetype='image/png')
 
 
 if __name__ == '__main__':

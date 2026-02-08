@@ -307,7 +307,11 @@ async function startGeneration() {
     }
 
     state.generating = true;
+    state.lastPayloads = {};
     $('#btn-generate').disabled = true;
+
+    // Hide previous results
+    $('#results-section').classList.add('hidden');
 
     // Show progress section
     const progressSection = $('.progress-section');
@@ -374,6 +378,10 @@ function connectSSE(sessionId) {
     es.addEventListener('image_done', (e) => {
         const data = JSON.parse(e.data);
         addLogEntry(`${data.filename} - 完了`, 'success');
+        if (data.payload) {
+            state.lastPayloads = state.lastPayloads || {};
+            state.lastPayloads[data.filename] = data.payload;
+        }
     });
 
     es.addEventListener('error_event', (e) => {
@@ -434,21 +442,50 @@ function showResults(data) {
 
     // Output directory link
     const dirEl = $('#results-output-dir');
-    const dirPath = data.output_dir;
-    dirEl.innerHTML = `<a onclick="openFolder('${escapeHtml(dirPath.replace(/\\/g, '\\\\'))}')">${escapeHtml(dirPath)}</a>`;
+    state.lastOutputDir = data.output_dir;
+    dirEl.innerHTML = `<a id="open-output-dir">${escapeHtml(data.output_dir)}</a>`;
+    document.getElementById('open-output-dir').addEventListener('click', () => {
+        openFolder(data.output_dir);
+    });
 
     // Image grid
     const grid = $('#results-grid');
     const subdir = data.output_subdir;
+    const payloads = state.lastPayloads || {};
+
     grid.innerHTML = (data.files || []).map(f => {
         const src = `/api/output/${encodeURIComponent(subdir)}/${encodeURIComponent(f)}`;
+        const payload = payloads[f];
+        const payloadId = 'payload-' + Math.random().toString(36).slice(2);
+        let payloadHtml = '';
+        if (payload) {
+            payloadHtml = `<div class="result-payload" id="${payloadId}">` +
+                `<div class="payload-row"><span class="payload-label">Positive:</span> <span class="payload-value">${escapeHtml(payload.prompt || '')}</span></div>` +
+                `<div class="payload-row"><span class="payload-label">Negative:</span> <span class="payload-value">${escapeHtml(payload.negative_prompt || '')}</span></div>`;
+            const settings = Object.entries(payload)
+                .filter(([k]) => k !== 'prompt' && k !== 'negative_prompt')
+                .map(([k, v]) => `${k}: ${typeof v === 'object' ? JSON.stringify(v) : v}`)
+                .join(', ');
+            if (settings) {
+                payloadHtml += `<div class="payload-row"><span class="payload-label">Settings:</span> <span class="payload-value">${escapeHtml(settings)}</span></div>`;
+            }
+            payloadHtml += '</div>';
+        }
         return `
-            <div class="result-card" onclick="openModal('${src}', '${escapeHtml(f)}')">
-                <img src="${src}" alt="${escapeHtml(f)}" loading="lazy">
+            <div class="result-card">
+                <img src="${src}" alt="${escapeHtml(f)}" loading="lazy" data-src="${src}" data-filename="${escapeHtml(f)}" class="result-img">
                 <div class="result-filename" title="${escapeHtml(f)}">${escapeHtml(f)}</div>
+                ${payloadHtml}
             </div>
         `;
     }).join('');
+
+    // Attach click handlers for modal
+    for (const img of grid.querySelectorAll('.result-img')) {
+        img.addEventListener('click', () => {
+            openModal(img.dataset.src, img.dataset.filename);
+        });
+    }
 
     section.scrollIntoView({ behavior: 'smooth' });
 }

@@ -504,8 +504,8 @@ button {
 }
 
 .results-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    display: flex;
+    flex-direction: column;
     gap: 10px;
 }
 
@@ -514,7 +514,9 @@ button {
     overflow: hidden;
     border: 1px solid var(--border);
     background: var(--bg-card);
-    cursor: pointer;
+    display: flex;
+    gap: 12px;
+    padding: 10px;
     transition: border-color 0.15s;
 }
 
@@ -522,20 +524,42 @@ button {
     border-color: var(--accent);
 }
 
-.result-card img {
-    width: 100%;
-    aspect-ratio: 1;
+.result-card .result-img {
+    width: 150px;
+    height: 150px;
     object-fit: cover;
-    display: block;
+    border-radius: 6px;
+    flex-shrink: 0;
+    cursor: pointer;
 }
 
 .result-card .result-filename {
-    padding: 4px 6px;
-    font-size: 0.7rem;
-    color: var(--text-secondary);
-    white-space: nowrap;
+    font-size: 0.8rem;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.result-payload {
+    flex: 1;
+    min-width: 0;
     overflow: hidden;
-    text-overflow: ellipsis;
+}
+
+.payload-row {
+    margin-bottom: 4px;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    word-break: break-all;
+}
+
+.payload-label {
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.payload-value {
+    color: var(--text-primary);
 }
 
 /* Modal */
